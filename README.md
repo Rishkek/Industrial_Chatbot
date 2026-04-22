@@ -1,373 +1,338 @@
-# Industrial_Chatbot
-ARIA — AI-Powered Industrial Document Chatbot
+ARIA — Adaptive Retrieval Intelligence Assistant
+
+AI-Powered Industrial Document Question-Answering System
+
 Overview
 
-ARIA (Adaptive Retrieval Intelligence Assistant) is an AI-powered industrial document chatbot designed to answer technical questions using uploaded PDF documents.
+ARIA (Adaptive Retrieval Intelligence Assistant) is an AI-powered document intelligence system designed to answer technical questions using uploaded PDF documents.
 
-The system implements a Retrieval-Augmented Generation (RAG) pipeline using Hugging Face language models, semantic embeddings, and FAISS vector search. Users can upload industrial or technical documents, ask questions, and receive structured responses derived from document content.
+The system implements a Retrieval-Augmented Generation (RAG) workflow that combines semantic search with large language model reasoning. Technical documents are processed, indexed, and queried through a Flask-based backend. A browser-based interface is provided through a Chrome extension.
 
-The project includes:
+ARIA is designed to simulate an industrial-grade technical assistant capable of extracting, interpreting, and presenting structured responses from engineering and industrial documentation.
 
-A Flask-based backend API
-A document indexing and retrieval pipeline
-A Chrome extension interface for user interaction
-An industrial-grade response persona (ARIA)
+Core Functionalities
+Document Upload and Processing
 
-This system demonstrates real-world document-based AI reasoning suitable for industrial and engineering environments.
-
-Repository Structure
-
-This repository follows the exact structure below:
-
-ARIA/
-│
-├── Source_Code/
-│   │
-│   ├── APP/
-│   │   │
-│   │   ├── saved_documents/
-│   │   │   (Stores uploaded PDF files)
-│   │   │
-│   │   ├── app.py
-│   │   │   Main backend Flask application
-│   │   │
-│   │   ├── requirements.txt
-│   │   │   Python dependencies
-│   │
-│   ├── chrome_extension/
-│   │   │
-│   │   ├── content.js
-│   │   │   Handles chatbot UI logic
-│   │   │
-│   │   ├── content.css
-│   │   │   Styles chatbot interface
-│   │   │
-│   │   ├── manifest.json
-│   │   │   Chrome extension configuration
-│   │   │
-│   │   ├── icon.png
-│   │       Extension icon
-│
-└── README.md
-System Architecture
-
-ARIA uses a Retrieval-Augmented Generation (RAG) architecture.
-
-Pipeline Flow
-User uploads a PDF
-PDF text is extracted
-Text is chunked into segments
-Embeddings are generated
-FAISS index is created
-User submits a query
-Relevant chunks are retrieved
-Prompt is constructed
-Language model generates response
-Answer is returned to user
-Core Features
-1. PDF Document Upload and Indexing
-
-Users can upload technical or industrial PDF documents.
-
-The system:
-
-Extracts text using PyMuPDF
-Splits text into overlapping chunks
-Generates vector embeddings
-Stores vectors in FAISS
-Makes document searchable
-
-Documents are stored inside:
+PDF documents are uploaded through the backend and stored locally in:
 
 Source_Code/APP/saved_documents/
-2. Retrieval-Augmented Question Answering
 
-The chatbot:
+Processing is handled inside:
 
-Converts user queries into embeddings
-Searches the FAISS index
-Retrieves the most relevant document sections
-Uses those sections to generate responses
+Source_Code/APP/app.py
 
-This ensures answers are grounded in document content.
+Document ingestion includes:
 
-3. ARIA Intelligent Persona
+Reading PDF content using PyMuPDF
+Extracting multi-page text
+Splitting text into overlapping segments
+Generating semantic embeddings
+Creating searchable vector indexes
 
-The chatbot operates using:
+Text chunking parameters are defined directly in:
 
-ARIA (Adaptive Retrieval Intelligence Assistant)
+Source_Code/APP/app.py
 
-ARIA is designed to:
+Key configuration variables:
 
-Provide structured responses
-Avoid hallucinated answers
-Interpret complex queries
-Ask for clarification when needed
-Maintain professional industrial tone
+CHUNK_SIZE
+CHUNK_OVERLAP
+TOP_K
 
-This improves reliability and usability in technical environments.
+These parameters determine chunk length, overlap behavior, and retrieval depth.
 
-4. Chrome Extension Interface
+Semantic Retrieval Engine
 
-The system includes a Chrome extension that allows users to interact with the chatbot directly from the browser.
+The semantic search workflow converts both document chunks and user queries into embeddings.
 
-The extension:
+Embedding generation uses:
 
-Sends queries to Flask backend
-Displays chatbot responses
-Provides user-friendly interface
-Enables quick document interaction
+sentence-transformers/all-MiniLM-L6-v2
+
+Vector indexing and retrieval are handled using FAISS, implemented in:
+
+Source_Code/APP/app.py
+
+During query execution:
+
+The user query is embedded
+The FAISS index is searched
+Top-K relevant chunks are retrieved
+Retrieved content is injected into the prompt
+
+This ensures responses remain grounded in document content.
+
+Language Model Response Generation
+
+Response generation is performed using the Hugging Face model:
+
+stabilityai/stablelm-zephyr-3b
+
+The model is initialized within:
+
+Source_Code/APP/app.py
+
+Prompt construction includes:
+
+System-level ARIA persona instructions
+Retrieved document context
+Conversation history
+User input
+
+This structured prompt ensures consistent and context-aware outputs.
+
+ARIA Persona System
+
+ARIA operates using a structured system persona defined inside:
+
+Source_Code/APP/app.py
+
+The persona enforces:
+
+Context-bound responses
+Structured technical output
+Clarification handling
+Professional communication style
+Follow-up support behavior
+
+This mechanism improves reliability and prevents unsupported answers.
+
+Conversational Memory Support
+
+Conversation history is maintained during interactions.
+
+Historical turns are:
+
+Included in prompt construction
+Limited to recent exchanges
+Used to preserve context continuity
+
+History handling logic exists in:
+
+build_prompt() function  
+Source_Code/APP/app.py
+
+This allows multi-step conversations instead of isolated queries.
+
+REST API Backend
+
+The system backend is implemented using Flask, located in:
+
+Source_Code/APP/app.py
+
+Available endpoints include:
+
+System Monitoring
+GET /health
+
+Returns:
+
+System status
+Active document name
+Indexed chunk count
+Document Management
+
+Upload document:
+
+POST /upload
+
+Load stored document:
+
+POST /load_document
+
+Delete document:
+
+POST /delete_document
+
+Clear active document:
+
+POST /clear_document
+
+List stored documents:
+
+GET /documents
+
+These endpoints manage document lifecycle operations.
+
+Chat Interaction
+
+Primary interaction endpoint:
+
+POST /chat
+
+Input includes:
+
+User message
+Conversation history
+
+Output includes:
+
+Generated response
+Number of retrieved sources
+Active document reference
+
+This endpoint forms the main conversational interface.
+
+Browser-Based User Interface
+
+User interaction is supported through a Chrome extension located in:
+
+Source_Code/chrome_extension/
 
 Key files:
 
-chrome_extension/
-├── content.js
-├── content.css
-├── manifest.json
-├── icon.png
-5. Multi-Document Management
+content.js
+content.css
+manifest.json
+icon.png
 
-Users can:
+Responsibilities include:
 
-Upload documents
-Load saved documents
-Delete documents
-Clear active document
+Capturing user queries
+Sending requests to Flask backend
+Rendering chatbot responses
+Styling the chat interface
+Managing extension permissions
 
-These features allow persistent document handling.
+The extension enables direct interaction without requiring a standalone web UI.
+
+System Behavior Summary
+
+The complete workflow executed by the system:
+
+PDF document is uploaded
+Text is extracted from the file
+Document is split into overlapping segments
+Embeddings are generated
+FAISS index is built
+User submits a query
+Relevant document segments are retrieved
+Prompt is assembled
+Language model generates response
+Response is returned to the interface
+
+This pipeline represents a full implementation of a retrieval-based question-answering system.
 
 Technologies Used
-Backend
+Backend Framework
 Python
 Flask
 Flask-CORS
 
-Used for:
+Responsible for:
 
-API development
-Chat interaction
-Document management
+API routing
+Document handling
+Query execution
 Language Model
-
-StableLM Zephyr 3B
-
-Used for:
-
-Generating responses
-Processing prompts
-Synthesizing answers
 
 Model:
 
 stabilityai/stablelm-zephyr-3b
-Embedding Model
-
-Sentence Transformers
-
-Model:
-
-all-MiniLM-L6-v2
 
 Used for:
 
-Semantic similarity
-Query retrieval
-Document matching
+Natural language generation
+Response synthesis
+Context reasoning
+Embedding Model
+
+Model:
+
+sentence-transformers/all-MiniLM-L6-v2
+
+Used for:
+
+Semantic search
+Vector encoding
+Document similarity matching
 Vector Database
+
+Library:
 
 FAISS
 
 Used for:
 
-Fast similarity search
-Efficient vector indexing
+High-speed similarity search
+Vector indexing
 Context retrieval
 PDF Processing
+
+Library:
 
 PyMuPDF (fitz)
 
 Used for:
 
 Reading PDF files
-Extracting document text
-Handling multi-page documents
+Extracting structured text
 Frontend Interface
 
+Platform:
+
 Chrome Extension
+
+Files located in:
+
+Source_Code/chrome_extension/
 
 Used for:
 
 User interaction
-Sending queries
-Displaying chatbot output
-API Endpoints
+Query submission
+Response display
+Functional Capabilities
 
-The Flask backend exposes the following endpoints:
+ARIA supports:
 
-Health Check
-GET /health
+Technical document querying
+Engineering manual interpretation
+Safety guideline retrieval
+Maintenance procedure lookup
+Troubleshooting assistance
+Context-aware conversational responses
 
-Returns:
+Supported document types:
 
-System status
-Active document
-Number of indexed chunks
-Upload PDF
-POST /upload
-
-Uploads and indexes a document.
-
-List Documents
-GET /documents
-
-Returns all stored PDF files.
-
-Load Document
-POST /load_document
-
-Loads a previously saved document.
-
-Delete Document
-POST /delete_document
-
-Deletes a stored document.
-
-Clear Active Document
-POST /clear_document
-
-Removes active document from memory.
-
-Chat Interface
-POST /chat
-
-Main chatbot interaction endpoint.
-
-Returns:
-
-Generated response
-Sources used
-Active document name
-Installation Guide
-Step 1 — Clone Repository
-git clone https://github.com/your-username/ARIA.git
-cd ARIA
-Step 2 — Install Dependencies
-
-Navigate to:
-
-Source_Code/APP
-
-Then run:
-
-pip install -r requirements.txt
-Step 3 — Run Backend Server
-
-Inside:
-
-Source_Code/APP
-
-Run:
-
-python app.py
-
-Server starts at:
-
-http://localhost:5000
-Step 4 — Load Chrome Extension
-Open Chrome
-Go to:
-chrome://extensions/
-Enable:
-Developer Mode
-Click:
-Load unpacked
-Select folder:
-Source_Code/chrome_extension/
-
-Extension will appear in toolbar.
-
-How to Use
-Upload Document
-
-Upload a technical PDF through the extension or API.
-
-The system will:
-
-Save document
-Extract text
-Build vector index
-Ask Questions
-
-Type a question such as:
-
-"What safety precautions are mentioned?"
-"Explain the startup procedure."
-"What are the maintenance steps?"
-
-ARIA retrieves relevant sections and generates structured answers.
-
-Configuration Parameters
-
-These values define system behavior:
-
-CHUNK_SIZE = 400
-CHUNK_OVERLAP = 80
-TOP_K = 4
-
-They control:
-
-Chunk length
-Overlap size
-Number of retrieved results
-Example Use Cases
-
-This chatbot can assist with:
-
-Industrial manuals
-Engineering documentation
-Maintenance procedures
-Safety protocols
-Troubleshooting guides
+Equipment manuals
+Safety documentation
+Maintenance guides
 Technical specifications
+Industrial procedures
+Design Characteristics
 
-Example queries:
+The system demonstrates:
 
-"List the startup steps."
-"What causes overheating?"
-"Explain safety precautions."
-"Summarize maintenance procedure."
-Strengths of This System
-
-This implementation demonstrates:
-
-Full RAG pipeline
-Real-time document ingestion
-Semantic search
-LLM-powered reasoning
+Retrieval-Augmented Generation architecture
+Dynamic document ingestion
+Context-aware prompt generation
+Semantic vector search
 Persistent document storage
+Modular API design
 Browser-based chatbot interface
 
-It simulates a real industrial knowledge assistant.
+These characteristics reflect real-world industrial document intelligence workflows.
 
-Future Improvements
+Potential Extensions
 
-Potential enhancements:
+Future development may include:
 
 Multi-document simultaneous retrieval
-Persistent FAISS index saving
-Streaming responses
-Web dashboard UI
-Voice interaction
-Model fine-tuning
-PDF summarization mode
-Project Purpose
+Persistent FAISS index storage
+Web-based dashboard interface
+Streaming response generation
+Voice interaction capability
+Model fine-tuning support
+Document summarization modes
+Project Scope
 
-This project demonstrates practical implementation of:
+ARIA represents a working implementation of:
 
-Retrieval-Augmented Generation
-Prompt Engineering
-Industrial AI Chatbots
-Semantic Search Systems
-Document Intelligence
+Document-based question answering
+Prompt engineering techniques
+Semantic search pipelines
+Industrial knowledge retrieval systems
+Retrieval-Augmented Generation (RAG)
 
-It serves as an example of applying AI to industrial technical documentation workflows.
+The system architecture supports scalable expansion into enterprise-level technical knowledge systems.
