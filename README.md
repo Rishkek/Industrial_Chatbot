@@ -6,7 +6,7 @@ Overview
 
 ARIA (Adaptive Retrieval Intelligence Assistant) is an AI-powered document intelligence system designed to answer technical questions using uploaded PDF documents.
 
-The system implements a Retrieval-Augmented Generation (RAG) workflow that combines semantic search with large language model reasoning. Technical documents are processed, indexed, and queried through a Flask-based backend. A browser-based interface is provided through a Chrome extension.
+The system implements a Retrieval-Augmented Generation (RAG) workflow that combines semantic search with large language model reasoning. Technical documents are processed, indexed, and queried through a Flask-based backend. A browser-based interface is provided through a Chrome extension..
 
 ARIA is designed to simulate an industrial-grade technical assistant capable of extracting, interpreting, and presenting structured responses from engineering and industrial documentation.
 
